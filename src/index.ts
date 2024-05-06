@@ -1,6 +1,8 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import marked from "marked";
+
+const REQUIRED_PR_SECTIONS = ["description", "how to test it", "approach"];
+const isUI = false;
 
 async function run() {
   try {
@@ -22,7 +24,23 @@ async function run() {
     });
 
     const prDescription = pr.body;
-    console.log(prDescription);
+
+    if (!prDescription) {
+      core.setFailed("PR Description is empty");
+      return;
+    }
+
+    const foundTitles = getPrTitles(prDescription);
+    const hasRequriedSections = REQUIRED_PR_SECTIONS.every((title) =>
+      foundTitles.has(title)
+    );
+
+    if (!hasRequriedSections) {
+      core.setFailed("Some required Titles are missing");
+      return;
+    }
+
+    core.info(prDescription);
   } catch (error: any) {
     core.setFailed(error.message);
   }
