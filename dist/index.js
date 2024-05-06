@@ -34,8 +34,16 @@ const core = __importStar(__nccwpck_require__(9093));
 const github = __importStar(__nccwpck_require__(5942));
 const marked_1 = __nccwpck_require__(2574);
 const utils_1 = __nccwpck_require__(933);
+// TODO: those should be inputs
 const REQUIRED_PR_SECTIONS = ["description", "how to test it", "approach"];
 const isUI = false;
+// the character count in each section by default
+const templateDefaults = {
+    description: 77,
+    howToTest: 64,
+    screenshots: 369,
+    approach: 50,
+};
 async function run() {
     try {
         const token = core.getInput("gh-token", { required: true });
@@ -70,7 +78,7 @@ async function run() {
         console.log(sections);
         sections.forEach((section) => {
             if (section.title.toLowerCase() === "description" &&
-                section.characterCount < 30) {
+                section.characterCount < templateDefaults.description + 30) {
                 throw new Error(`Section ${section.title} should have more than 30 characters at least`);
             }
             if (section.characterCount < 10) {
@@ -99,7 +107,7 @@ run();
  * @returns {Set<string>} returns all the heading titles h1, h2, h3 in a Set
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseSections = exports.getPrTitles = void 0;
+exports.filterCommentsFromMarkdown = exports.parseSections = exports.getPrTitles = void 0;
 function getPrTitles(parsedMarkdown) {
     // Regex for h1-h3 tags with capturing group
     const regex = /<h[1-3]>(.*?)<\/h[1-3]>/gi;
@@ -144,6 +152,10 @@ function parseSections(parsedMarkdown) {
     return sections;
 }
 exports.parseSections = parseSections;
+function filterCommentsFromMarkdown() {
+    //TODO
+}
+exports.filterCommentsFromMarkdown = filterCommentsFromMarkdown;
 
 
 /***/ }),
