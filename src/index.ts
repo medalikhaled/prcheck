@@ -7,9 +7,10 @@ import { getPrTitles, parseSections } from "./utils";
 const REQUIRED_PR_SECTIONS = ["description", "how to test it", "approach"];
 const isUI = false;
 
+// TODO: find a better way for those (more dynamic)
 // the character count in each section by default
 const templateDefaults = {
-  description: 77,
+  description: 0,
   howToTest: 64,
   screenshots: 369,
   approach: 50,
