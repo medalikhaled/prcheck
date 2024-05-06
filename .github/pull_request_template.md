@@ -38,4 +38,3 @@ Provide a list of tasks/doubts to clarify if the pull request is still a _draft_
 
 - [ ] Use GitHub checklists. When solved, check the box and explain the answer.
 -->
-

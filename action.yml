@@ -4,6 +4,7 @@ description: "an action that will check if the PR description contains the requi
 inputs:
   gh-token:
     description: Github token
+    required: true
 runs:
   using: "node20"
   main: "./dist/index.js"
