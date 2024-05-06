@@ -18,7 +18,14 @@ export function getPrTitles(parsedMarkdown: string): Set<String> {
   return foundTitles;
 }
 
-export function parseSections(parsedMarkdown: string) {
+type Section = {
+  title: string;
+  content: string;
+  characterCount: number;
+};
+
+//? Last one always isn't counted because this function calculates character between two sections
+export function parseSections(parsedMarkdown: string): Section[] {
   const sections = [];
   let currentTitle = null;
   let content = "";

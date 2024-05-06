@@ -31,9 +31,11 @@ async function run() {
       core.setFailed("PR Description is empty");
       return;
     }
-    const parsedContent = await marked(prDescription);
+    const prDescContent = await marked(prDescription);
 
-    const foundTitles = getPrTitles(parsedContent);
+    const foundTitles = getPrTitles(prDescContent);
+
+    core.info("Found titles are: ");
     console.log(foundTitles);
 
     const hasRequriedSections = REQUIRED_PR_SECTIONS.every((title) =>
@@ -45,7 +47,31 @@ async function run() {
       return;
     }
 
-    core.info(prDescription);
+    const sections = parseSections(prDescContent);
+
+    core.info("Found sections");
+    console.log(sections);
+
+    sections.forEach((section) => {
+      if (
+        section.title.toLowerCase() === "description" &&
+        section.characterCount < 30
+      ) {
+        throw new Error(
+          `Section ${section.title} should have more than 30 characters at least`
+        );
+      }
+
+      if (section.characterCount < 10) {
+        throw new Error(
+          `Section ${section.title} should have more than 10 characters at least`
+        );
+      }
+    });
+
+    core.debug(
+      "Job completed Successfully, all required sections meet the critera"
+    );
   } catch (error: any) {
     core.setFailed(error.message);
   }

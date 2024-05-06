@@ -56,15 +56,28 @@ async function run() {
             core.setFailed("PR Description is empty");
             return;
         }
-        const parsedContent = await (0, marked_1.marked)(prDescription);
-        const foundTitles = (0, utils_1.getPrTitles)(parsedContent);
+        const prDescContent = await (0, marked_1.marked)(prDescription);
+        const foundTitles = (0, utils_1.getPrTitles)(prDescContent);
+        core.info("Found titles are: ");
         console.log(foundTitles);
         const hasRequriedSections = REQUIRED_PR_SECTIONS.every((title) => foundTitles.has(title));
         if (!hasRequriedSections) {
             core.setFailed("Some required Titles are missing");
             return;
         }
-        core.info(prDescription);
+        const sections = (0, utils_1.parseSections)(prDescContent);
+        core.info("Found sections");
+        console.log(sections);
+        sections.forEach((section) => {
+            if (section.title.toLowerCase() === "description" &&
+                section.characterCount < 30) {
+                throw new Error(`Section ${section.title} should have more than 30 characters at least`);
+            }
+            if (section.characterCount < 10) {
+                throw new Error(`Section ${section.title} should have more than 10 characters at least`);
+            }
+        });
+        core.debug("Job completed Successfully, all required sections meet the critera");
     }
     catch (error) {
         core.setFailed(error.message);
@@ -98,6 +111,7 @@ function getPrTitles(parsedMarkdown) {
     return foundTitles;
 }
 exports.getPrTitles = getPrTitles;
+//? Last one always isn't counted because this function calculates character between two sections
 function parseSections(parsedMarkdown) {
     const sections = [];
     let currentTitle = null;
