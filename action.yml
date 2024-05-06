@@ -1,6 +1,11 @@
 name: "PR Description Check"
 description: "an action that will check if the PR description contains the required sections"
 
+inputs:
+  example:
+    description: "palceholder value"
+    default: "world"
+
 runs:
   using: "node20"
   main: "./dist/index.js"

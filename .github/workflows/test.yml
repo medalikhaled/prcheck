@@ -1,0 +1,14 @@
+name: "test out pr description action"
+on:
+  workflow_dispatch:
+
+jobs:
+  check-description:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "checkout"
+        uses: actions/checkout@v4
+      - name: "Check PR Description"
+        uses: "./"
+        with:
+          example: "dali"
