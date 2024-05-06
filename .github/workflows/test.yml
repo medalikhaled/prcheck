@@ -11,4 +11,4 @@ jobs:
       - name: "Check PR Description"
         uses: "./"
         with:
-          example: "dali"
+          gh-token: ${{secrets.GITHUB_TOKEN}}

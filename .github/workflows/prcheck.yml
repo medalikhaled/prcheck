@@ -1,0 +1,17 @@
+name: "PR description check"
+on:
+  pull_request:
+    types: [opened, reopened, edited]
+
+jobs:
+  check-description:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "checkout"
+        uses: actions/checkout@v4
+      - name: "Check PR Description"
+        env:
+          PR_DESCRIPTION: ${{ github.event.pull_request.body }}
+        uses: "./"
+        with:
+          gh-token: ${{ secrets.GITHUB_TOKEN }}
