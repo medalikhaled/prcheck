@@ -3,8 +3,17 @@ import * as github from "@actions/github";
 import { marked } from "marked";
 import { getPrTitles, parseSections } from "./utils";
 
+// TODO: those should be inputs
 const REQUIRED_PR_SECTIONS = ["description", "how to test it", "approach"];
 const isUI = false;
+
+// the character count in each section by default
+const templateDefaults = {
+  description: 77,
+  howToTest: 64,
+  screenshots: 369,
+  approach: 50,
+};
 
 async function run() {
   try {
@@ -55,7 +64,7 @@ async function run() {
     sections.forEach((section) => {
       if (
         section.title.toLowerCase() === "description" &&
-        section.characterCount < 30
+        section.characterCount < templateDefaults.description + 30
       ) {
         throw new Error(
           `Section ${section.title} should have more than 30 characters at least`

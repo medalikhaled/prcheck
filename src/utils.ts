@@ -61,3 +61,7 @@ export function parseSections(parsedMarkdown: string): Section[] {
   }
   return sections;
 }
+
+export function filterCommentsFromMarkdown() {
+  //TODO
+}
