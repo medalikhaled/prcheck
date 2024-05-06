@@ -4,18 +4,17 @@ import * as github from "@actions/github";
 const REQUIRED_PR_SECTIONS = ["description", "how to test it", "approach"];
 const isUI = false;
 
-//TODO: test this one
 /**
  *
  * @param {string} parsedMarkdown takes in a parsed markdown string
  * @returns {Set<string>} returns all the heading titles h1, h2, h3 in a Set
  */
 
-function getPrTitles(parsedMarkdown: string) {
+function getPrTitles(parsedMarkdown: string): Set<String> {
   // Regex for h1-h3 tags with capturing group
   const regex = /<h[1-3]>(.*?)<\/h[1-3]>/gi;
 
-  const foundTitles = new Set();
+  const foundTitles = new Set<string>();
   let match;
 
   while ((match = regex.exec(parsedMarkdown)) !== null) {
@@ -25,7 +24,6 @@ function getPrTitles(parsedMarkdown: string) {
   return foundTitles;
 }
 
-//! last section is always ign
 function parseSections(parsedMarkdown: string) {
   const sections = [];
   let currentTitle = null;
@@ -90,6 +88,8 @@ async function run() {
     }
 
     const foundTitles = getPrTitles(prDescription);
+    console.log(foundTitles);
+
     const hasRequriedSections = REQUIRED_PR_SECTIONS.every((title) =>
       foundTitles.has(title)
     );

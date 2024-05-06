@@ -34,7 +34,6 @@ const core = __importStar(__nccwpck_require__(9093));
 const github = __importStar(__nccwpck_require__(5942));
 const REQUIRED_PR_SECTIONS = ["description", "how to test it", "approach"];
 const isUI = false;
-//TODO: test this one
 /**
  *
  * @param {string} parsedMarkdown takes in a parsed markdown string
@@ -50,7 +49,6 @@ function getPrTitles(parsedMarkdown) {
     }
     return foundTitles;
 }
-//! last section is always ign
 function parseSections(parsedMarkdown) {
     const sections = [];
     let currentTitle = null;
@@ -103,6 +101,7 @@ async function run() {
             return;
         }
         const foundTitles = getPrTitles(prDescription);
+        console.log(foundTitles);
         const hasRequriedSections = REQUIRED_PR_SECTIONS.every((title) => foundTitles.has(title));
         if (!hasRequriedSections) {
             core.setFailed("Some required Titles are missing");
