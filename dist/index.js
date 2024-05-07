@@ -43,7 +43,6 @@ function getRequiredSections() {
 }
 const requiredSections = getRequiredSections();
 const REQUIRED_PR_SECTIONS = requiredSections.length === 0 ? ["description", "how to test it", "approach"] : requiredSections;
-console.log(requiredSections);
 async function run() {
     try {
         const token = core.getInput("gh-token", { required: true });
@@ -67,18 +66,12 @@ async function run() {
         //? remove comments from PR content
         prDescription = prDescription?.replace(/<!--[\s\S]*?-->/g, "");
         const prDescContent = await (0, marked_1.marked)(prDescription);
-        // console.log("PARSED \n", prDescContent);
         const foundTitles = (0, utils_1.getPrTitles)(prDescContent);
-        core.info("Found titles are: ");
-        console.log(foundTitles);
         const hasRequriedSections = REQUIRED_PR_SECTIONS.every((title) => foundTitles.has(title));
         if (!hasRequriedSections) {
-            core.setFailed("Some required Titles are missing");
-            return;
+            throw new Error(`"Some required Titles are missing"`);
         }
         const sections = (0, utils_1.parseSections)(prDescContent);
-        // core.info("Found sections");
-        // console.log(sections);
         sections.forEach((section) => {
             if (section.title.toLowerCase() === "description" && section.characterCount < 30) {
                 throw new Error(`Section ${section.title} should have more than 30 characters at least`);
