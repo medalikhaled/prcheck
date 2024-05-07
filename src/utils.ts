@@ -24,7 +24,7 @@ type Section = {
   characterCount: number;
 };
 
-//? Last one always isn't counted because this function calculates character between two sections
+//! Last section always will have a character count of 0 since there is no section after it
 export function parseSections(parsedMarkdown: string): Section[] {
   const sections = [];
   let currentTitle = null;
@@ -51,7 +51,8 @@ export function parseSections(parsedMarkdown: string): Section[] {
     content = currentContent;
   }
 
-  // Add the last section if content exists after the final heading
+  //TODO: if section isLast count till the end of the pr desc string
+
   if (currentTitle) {
     sections.push({
       title: currentTitle,
@@ -60,8 +61,4 @@ export function parseSections(parsedMarkdown: string): Section[] {
     });
   }
   return sections;
-}
-
-export function filterCommentsFromMarkdown() {
-  //TODO
 }

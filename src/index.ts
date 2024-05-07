@@ -41,8 +41,6 @@ async function run() {
       return;
     }
 
-    console.log("BEFORE \n", prDescription);
-
     //? remove comments from PR content
     prDescription = prDescription?.replace(/<!--[\s\S]*?-->/g, "");
 
