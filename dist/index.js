@@ -64,7 +64,6 @@ async function run() {
             core.setFailed("PR Description is empty");
             return;
         }
-        console.log("BEFORE \n", prDescription);
         //? remove comments from PR content
         prDescription = prDescription?.replace(/<!--[\s\S]*?-->/g, "");
         const prDescContent = await (0, marked_1.marked)(prDescription);
@@ -111,7 +110,7 @@ run();
  * @returns {Set<string>} returns all the heading titles h1, h2, h3 in a Set
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.filterCommentsFromMarkdown = exports.parseSections = exports.getPrTitles = void 0;
+exports.parseSections = exports.getPrTitles = void 0;
 function getPrTitles(parsedMarkdown) {
     // Regex for h1-h3 tags with capturing group
     const regex = /<h[1-3]>(.*?)<\/h[1-3]>/gi;
@@ -123,7 +122,7 @@ function getPrTitles(parsedMarkdown) {
     return foundTitles;
 }
 exports.getPrTitles = getPrTitles;
-//? Last one always isn't counted because this function calculates character between two sections
+//! Last section always will have a character count of 0 since there is no section after it
 function parseSections(parsedMarkdown) {
     const sections = [];
     let currentTitle = null;
@@ -145,7 +144,7 @@ function parseSections(parsedMarkdown) {
         currentTitle = title;
         content = currentContent;
     }
-    // Add the last section if content exists after the final heading
+    //TODO: if section isLast count till the end of the pr desc string
     if (currentTitle) {
         sections.push({
             title: currentTitle,
@@ -156,10 +155,6 @@ function parseSections(parsedMarkdown) {
     return sections;
 }
 exports.parseSections = parseSections;
-function filterCommentsFromMarkdown() {
-    //TODO
-}
-exports.filterCommentsFromMarkdown = filterCommentsFromMarkdown;
 
 
 /***/ }),
