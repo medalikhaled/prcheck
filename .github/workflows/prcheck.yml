@@ -1,7 +1,7 @@
 name: "PR description check"
 on:
   pull_request:
-    types: [opened, reopened, edited]
+    types: [opened, reopened, edited, synchronize]
     branches: [main, develop, master]
 
 jobs:
@@ -15,3 +15,4 @@ jobs:
         uses: "./"
         with:
           gh-token: ${{ secrets.GITHUB_TOKEN }}
+          required-sections: "description,how to test it,approach"

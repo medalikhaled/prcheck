@@ -4,17 +4,17 @@ import { marked } from "marked";
 import { getPrTitles, parseSections } from "./utils";
 
 // TODO: those should be inputs
-const REQUIRED_PR_SECTIONS = ["description", "how to test it", "approach"];
 const isUI = false;
 
-// TODO: find a better way for those (more dynamic)
-// the character count in each section by default
-const templateDefaults = {
-  description: 0,
-  howToTest: 64,
-  screenshots: 369,
-  approach: 50,
-};
+function getRequiredSections(): string[] {
+  const requiredSectionsInput = core.getInput("required-sections");
+  const requiredSections = requiredSectionsInput.split(",");
+  return requiredSections;
+}
+
+const requiredSections = getRequiredSections();
+const REQUIRED_PR_SECTIONS =
+  requiredSections.length === 0 ? ["description", "how to test it", "approach"] : requiredSections;
 
 async function run() {
   try {
@@ -35,53 +35,37 @@ async function run() {
       pull_number: prNumber,
     });
 
-    const prDescription = pr.body;
+    let prDescription = pr.body;
 
     if (!prDescription) {
       core.setFailed("PR Description is empty");
       return;
     }
+
+    //? remove comments from PR content
+    prDescription = prDescription?.replace(/<!--[\s\S]*?-->/g, "");
+
     const prDescContent = await marked(prDescription);
 
     const foundTitles = getPrTitles(prDescContent);
 
-    core.info("Found titles are: ");
-    console.log(foundTitles);
-
-    const hasRequriedSections = REQUIRED_PR_SECTIONS.every((title) =>
-      foundTitles.has(title)
-    );
+    const hasRequriedSections = REQUIRED_PR_SECTIONS.every((title) => foundTitles.has(title));
 
     if (!hasRequriedSections) {
-      core.setFailed("Some required Titles are missing");
-      return;
+      throw new Error(`"Some required Titles are missing"`);
     }
 
     const sections = parseSections(prDescContent);
 
-    core.info("Found sections");
-    console.log(sections);
-
     sections.forEach((section) => {
-      if (
-        section.title.toLowerCase() === "description" &&
-        section.characterCount < templateDefaults.description + 30
-      ) {
-        throw new Error(
-          `Section ${section.title} should have more than 30 characters at least`
-        );
+      if (section.title.toLowerCase() === "description" && section.characterCount < 30) {
+        throw new Error(`Section ${section.title} should have more than 30 characters at least`);
       }
 
-      if (section.characterCount < 10) {
-        throw new Error(
-          `Section ${section.title} should have more than 10 characters at least`
-        );
+      if (REQUIRED_PR_SECTIONS.includes(section.title.toLocaleLowerCase()) && section.characterCount < 20) {
+        throw new Error(`Section ${section.title} should have more than 20 characters at least`);
       }
     });
-
-    core.debug(
-      "Job completed Successfully, all required sections meet the critera"
-    );
   } catch (error: any) {
     core.setFailed(error.message);
   }

@@ -35,15 +35,14 @@ const github = __importStar(__nccwpck_require__(5942));
 const marked_1 = __nccwpck_require__(2574);
 const utils_1 = __nccwpck_require__(933);
 // TODO: those should be inputs
-const REQUIRED_PR_SECTIONS = ["description", "how to test it", "approach"];
 const isUI = false;
-// the character count in each section by default
-const templateDefaults = {
-    description: 77,
-    howToTest: 64,
-    screenshots: 369,
-    approach: 50,
-};
+function getRequiredSections() {
+    const requiredSectionsInput = core.getInput("required-sections");
+    const requiredSections = requiredSectionsInput.split(",");
+    return requiredSections;
+}
+const requiredSections = getRequiredSections();
+const REQUIRED_PR_SECTIONS = requiredSections.length === 0 ? ["description", "how to test it", "approach"] : requiredSections;
 async function run() {
     try {
         const token = core.getInput("gh-token", { required: true });
@@ -59,33 +58,28 @@ async function run() {
             repo: context.repo.repo,
             pull_number: prNumber,
         });
-        const prDescription = pr.body;
+        let prDescription = pr.body;
         if (!prDescription) {
             core.setFailed("PR Description is empty");
             return;
         }
+        //? remove comments from PR content
+        prDescription = prDescription?.replace(/<!--[\s\S]*?-->/g, "");
         const prDescContent = await (0, marked_1.marked)(prDescription);
         const foundTitles = (0, utils_1.getPrTitles)(prDescContent);
-        core.info("Found titles are: ");
-        console.log(foundTitles);
         const hasRequriedSections = REQUIRED_PR_SECTIONS.every((title) => foundTitles.has(title));
         if (!hasRequriedSections) {
-            core.setFailed("Some required Titles are missing");
-            return;
+            throw new Error(`"Some required Titles are missing"`);
         }
         const sections = (0, utils_1.parseSections)(prDescContent);
-        core.info("Found sections");
-        console.log(sections);
         sections.forEach((section) => {
-            if (section.title.toLowerCase() === "description" &&
-                section.characterCount < templateDefaults.description + 30) {
+            if (section.title.toLowerCase() === "description" && section.characterCount < 30) {
                 throw new Error(`Section ${section.title} should have more than 30 characters at least`);
             }
-            if (section.characterCount < 10) {
-                throw new Error(`Section ${section.title} should have more than 10 characters at least`);
+            if (REQUIRED_PR_SECTIONS.includes(section.title.toLocaleLowerCase()) && section.characterCount < 20) {
+                throw new Error(`Section ${section.title} should have more than 20 characters at least`);
             }
         });
-        core.debug("Job completed Successfully, all required sections meet the critera");
     }
     catch (error) {
         core.setFailed(error.message);
@@ -107,7 +101,7 @@ run();
  * @returns {Set<string>} returns all the heading titles h1, h2, h3 in a Set
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.filterCommentsFromMarkdown = exports.parseSections = exports.getPrTitles = void 0;
+exports.parseSections = exports.getPrTitles = void 0;
 function getPrTitles(parsedMarkdown) {
     // Regex for h1-h3 tags with capturing group
     const regex = /<h[1-3]>(.*?)<\/h[1-3]>/gi;
@@ -119,7 +113,7 @@ function getPrTitles(parsedMarkdown) {
     return foundTitles;
 }
 exports.getPrTitles = getPrTitles;
-//? Last one always isn't counted because this function calculates character between two sections
+//! Last section always will have a character count of 0 since there is no section after it
 function parseSections(parsedMarkdown) {
     const sections = [];
     let currentTitle = null;
@@ -141,7 +135,7 @@ function parseSections(parsedMarkdown) {
         currentTitle = title;
         content = currentContent;
     }
-    // Add the last section if content exists after the final heading
+    //TODO: if section isLast count till the end of the pr desc string
     if (currentTitle) {
         sections.push({
             title: currentTitle,
@@ -152,10 +146,13 @@ function parseSections(parsedMarkdown) {
     return sections;
 }
 exports.parseSections = parseSections;
-function filterCommentsFromMarkdown() {
-    //TODO
-}
-exports.filterCommentsFromMarkdown = filterCommentsFromMarkdown;
+// TODO: find a better way for those (more dynamic)
+const templateDefaults = {
+    description: 30,
+    howToTest: 20,
+    screenshots: 20,
+    approach: 20,
+};
 
 
 /***/ }),
