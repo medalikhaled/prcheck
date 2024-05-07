@@ -75,16 +75,16 @@ async function run() {
     sections.forEach((section) => {
       if (
         section.title.toLowerCase() === "description" &&
-        section.characterCount < templateDefaults.description + 30
+        section.characterCount < 30
       ) {
         throw new Error(
           `Section ${section.title} should have more than 30 characters at least`
         );
       }
 
-      if (section.characterCount < 10) {
+      if (section.characterCount < 20) {
         throw new Error(
-          `Section ${section.title} should have more than 10 characters at least`
+          `Section ${section.title} should have more than 20 characters at least`
         );
       }
     });

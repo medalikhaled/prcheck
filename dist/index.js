@@ -65,9 +65,12 @@ async function run() {
             core.setFailed("PR Description is empty");
             return;
         }
+        console.log("BEFORE \n", prDescription);
         //remove comments
         prDescription = prDescription?.replace(/<!--[\s\S]*?-->/g, "");
+        console.log("LATER \n", prDescription);
         const prDescContent = await (0, marked_1.marked)(prDescription);
+        console.log("PARSED \n", prDescContent);
         const foundTitles = (0, utils_1.getPrTitles)(prDescContent);
         // core.info("Found titles are: ");
         // console.log(foundTitles);
@@ -81,11 +84,11 @@ async function run() {
         // console.log(sections);
         sections.forEach((section) => {
             if (section.title.toLowerCase() === "description" &&
-                section.characterCount < templateDefaults.description + 30) {
+                section.characterCount < 30) {
                 throw new Error(`Section ${section.title} should have more than 30 characters at least`);
             }
-            if (section.characterCount < 10) {
-                throw new Error(`Section ${section.title} should have more than 10 characters at least`);
+            if (section.characterCount < 20) {
+                throw new Error(`Section ${section.title} should have more than 20 characters at least`);
             }
         });
     }
