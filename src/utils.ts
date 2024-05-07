@@ -52,7 +52,6 @@ export function parseSections(parsedMarkdown: string): Section[] {
   }
 
   //TODO: if section isLast count till the end of the pr desc string
-
   if (currentTitle) {
     sections.push({
       title: currentTitle,
