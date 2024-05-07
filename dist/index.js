@@ -37,9 +37,10 @@ const utils_1 = __nccwpck_require__(933);
 // TODO: those should be inputs
 const REQUIRED_PR_SECTIONS = ["description", "how to test it", "approach"];
 const isUI = false;
+// TODO: find a better way for those (more dynamic)
 // the character count in each section by default
 const templateDefaults = {
-    description: 77,
+    description: 0,
     howToTest: 64,
     screenshots: 369,
     approach: 50,
@@ -59,23 +60,25 @@ async function run() {
             repo: context.repo.repo,
             pull_number: prNumber,
         });
-        const prDescription = pr.body;
+        let prDescription = pr.body;
         if (!prDescription) {
             core.setFailed("PR Description is empty");
             return;
         }
+        //remove comments
+        prDescription = prDescription?.replace(/<!--[\s\S]*?-->/g, "");
         const prDescContent = await (0, marked_1.marked)(prDescription);
         const foundTitles = (0, utils_1.getPrTitles)(prDescContent);
-        core.info("Found titles are: ");
-        console.log(foundTitles);
+        // core.info("Found titles are: ");
+        // console.log(foundTitles);
         const hasRequriedSections = REQUIRED_PR_SECTIONS.every((title) => foundTitles.has(title));
         if (!hasRequriedSections) {
             core.setFailed("Some required Titles are missing");
             return;
         }
         const sections = (0, utils_1.parseSections)(prDescContent);
-        core.info("Found sections");
-        console.log(sections);
+        // core.info("Found sections");
+        // console.log(sections);
         sections.forEach((section) => {
             if (section.title.toLowerCase() === "description" &&
                 section.characterCount < templateDefaults.description + 30) {
@@ -85,7 +88,6 @@ async function run() {
                 throw new Error(`Section ${section.title} should have more than 10 characters at least`);
             }
         });
-        core.debug("Job completed Successfully, all required sections meet the critera");
     }
     catch (error) {
         core.setFailed(error.message);

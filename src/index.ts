@@ -35,18 +35,21 @@ async function run() {
       pull_number: prNumber,
     });
 
-    const prDescription = pr.body;
+    let prDescription = pr.body;
 
     if (!prDescription) {
       core.setFailed("PR Description is empty");
       return;
     }
+    //remove comments
+    prDescription = prDescription?.replace(/<!--[\s\S]*?-->/g, "");
+
     const prDescContent = await marked(prDescription);
 
     const foundTitles = getPrTitles(prDescContent);
 
-    core.info("Found titles are: ");
-    console.log(foundTitles);
+    // core.info("Found titles are: ");
+    // console.log(foundTitles);
 
     const hasRequriedSections = REQUIRED_PR_SECTIONS.every((title) =>
       foundTitles.has(title)
@@ -59,8 +62,8 @@ async function run() {
 
     const sections = parseSections(prDescContent);
 
-    core.info("Found sections");
-    console.log(sections);
+    // core.info("Found sections");
+    // console.log(sections);
 
     sections.forEach((section) => {
       if (
@@ -78,10 +81,6 @@ async function run() {
         );
       }
     });
-
-    core.debug(
-      "Job completed Successfully, all required sections meet the critera"
-    );
   } catch (error: any) {
     core.setFailed(error.message);
   }
