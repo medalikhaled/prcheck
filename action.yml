@@ -5,6 +5,16 @@ inputs:
   gh-token:
     description: Github token
     required: true
+
+  required-sections:
+    description: "List of required sections in the PR description"
+    required: false
+    default: "description,how to test it,approach"
+
 runs:
   using: "node20"
   main: "./dist/index.js"
+
+branding:
+  icon: "bookmark"
+  color: "purple"

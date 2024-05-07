@@ -35,15 +35,15 @@ const github = __importStar(__nccwpck_require__(5942));
 const marked_1 = __nccwpck_require__(2574);
 const utils_1 = __nccwpck_require__(933);
 // TODO: those should be inputs
-const REQUIRED_PR_SECTIONS = ["description", "how to test it", "approach"];
 const isUI = false;
-// TODO: find a better way for those (more dynamic)
-const templateDefaults = {
-    description: 30,
-    howToTest: 20,
-    screenshots: 20,
-    approach: 20,
-};
+function getRequiredSections() {
+    const requiredSectionsInput = core.getInput("required-sections");
+    const requiredSections = requiredSectionsInput.split(",");
+    return requiredSections;
+}
+const requiredSections = getRequiredSections();
+const REQUIRED_PR_SECTIONS = requiredSections.length === 0 ? ["description", "how to test it", "approach"] : requiredSections;
+console.log(requiredSections);
 async function run() {
     try {
         const token = core.getInput("gh-token", { required: true });
@@ -80,12 +80,10 @@ async function run() {
         // core.info("Found sections");
         // console.log(sections);
         sections.forEach((section) => {
-            if (section.title.toLowerCase() === "description" &&
-                section.characterCount < 30) {
+            if (section.title.toLowerCase() === "description" && section.characterCount < 30) {
                 throw new Error(`Section ${section.title} should have more than 30 characters at least`);
             }
-            if (REQUIRED_PR_SECTIONS.includes(section.title.toLocaleLowerCase()) &&
-                section.characterCount < 20) {
+            if (REQUIRED_PR_SECTIONS.includes(section.title.toLocaleLowerCase()) && section.characterCount < 20) {
                 throw new Error(`Section ${section.title} should have more than 20 characters at least`);
             }
         });
@@ -155,6 +153,13 @@ function parseSections(parsedMarkdown) {
     return sections;
 }
 exports.parseSections = parseSections;
+// TODO: find a better way for those (more dynamic)
+const templateDefaults = {
+    description: 30,
+    howToTest: 20,
+    screenshots: 20,
+    approach: 20,
+};
 
 
 /***/ }),

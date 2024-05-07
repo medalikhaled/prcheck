@@ -4,16 +4,19 @@ import { marked } from "marked";
 import { getPrTitles, parseSections } from "./utils";
 
 // TODO: those should be inputs
-const REQUIRED_PR_SECTIONS = ["description", "how to test it", "approach"];
 const isUI = false;
 
-// TODO: find a better way for those (more dynamic)
-const templateDefaults = {
-  description: 30,
-  howToTest: 20,
-  screenshots: 20,
-  approach: 20,
-};
+function getRequiredSections(): string[] {
+  const requiredSectionsInput = core.getInput("required-sections");
+  const requiredSections = requiredSectionsInput.split(",");
+  return requiredSections;
+}
+
+const requiredSections = getRequiredSections();
+const REQUIRED_PR_SECTIONS =
+  requiredSections.length === 0 ? ["description", "how to test it", "approach"] : requiredSections;
+
+console.log(requiredSections);
 
 async function run() {
   try {
@@ -53,9 +56,7 @@ async function run() {
     core.info("Found titles are: ");
     console.log(foundTitles);
 
-    const hasRequriedSections = REQUIRED_PR_SECTIONS.every((title) =>
-      foundTitles.has(title)
-    );
+    const hasRequriedSections = REQUIRED_PR_SECTIONS.every((title) => foundTitles.has(title));
 
     if (!hasRequriedSections) {
       core.setFailed("Some required Titles are missing");
@@ -68,22 +69,12 @@ async function run() {
     // console.log(sections);
 
     sections.forEach((section) => {
-      if (
-        section.title.toLowerCase() === "description" &&
-        section.characterCount < 30
-      ) {
-        throw new Error(
-          `Section ${section.title} should have more than 30 characters at least`
-        );
+      if (section.title.toLowerCase() === "description" && section.characterCount < 30) {
+        throw new Error(`Section ${section.title} should have more than 30 characters at least`);
       }
 
-      if (
-        REQUIRED_PR_SECTIONS.includes(section.title.toLocaleLowerCase()) &&
-        section.characterCount < 20
-      ) {
-        throw new Error(
-          `Section ${section.title} should have more than 20 characters at least`
-        );
+      if (REQUIRED_PR_SECTIONS.includes(section.title.toLocaleLowerCase()) && section.characterCount < 20) {
+        throw new Error(`Section ${section.title} should have more than 20 characters at least`);
       }
     });
   } catch (error: any) {

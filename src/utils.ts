@@ -61,3 +61,11 @@ export function parseSections(parsedMarkdown: string): Section[] {
   }
   return sections;
 }
+
+// TODO: find a better way for those (more dynamic)
+const templateDefaults = {
+  description: 30,
+  howToTest: 20,
+  screenshots: 20,
+  approach: 20,
+};
