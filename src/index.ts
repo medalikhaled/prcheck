@@ -8,12 +8,11 @@ const REQUIRED_PR_SECTIONS = ["description", "how to test it", "approach"];
 const isUI = false;
 
 // TODO: find a better way for those (more dynamic)
-// the character count in each section by default
 const templateDefaults = {
-  description: 0,
-  howToTest: 64,
-  screenshots: 369,
-  approach: 50,
+  description: 30,
+  howToTest: 20,
+  screenshots: 20,
+  approach: 20,
 };
 
 async function run() {
@@ -44,19 +43,17 @@ async function run() {
 
     console.log("BEFORE \n", prDescription);
 
-    //remove comments
+    //? remove comments from PR content
     prDescription = prDescription?.replace(/<!--[\s\S]*?-->/g, "");
-
-    console.log("LATER \n", prDescription);
 
     const prDescContent = await marked(prDescription);
 
-    console.log("PARSED \n", prDescContent);
+    // console.log("PARSED \n", prDescContent);
 
     const foundTitles = getPrTitles(prDescContent);
 
-    // core.info("Found titles are: ");
-    // console.log(foundTitles);
+    core.info("Found titles are: ");
+    console.log(foundTitles);
 
     const hasRequriedSections = REQUIRED_PR_SECTIONS.every((title) =>
       foundTitles.has(title)
@@ -82,7 +79,10 @@ async function run() {
         );
       }
 
-      if (section.characterCount < 20) {
+      if (
+        REQUIRED_PR_SECTIONS.includes(section.title.toLocaleLowerCase()) &&
+        section.characterCount < 20
+      ) {
         throw new Error(
           `Section ${section.title} should have more than 20 characters at least`
         );

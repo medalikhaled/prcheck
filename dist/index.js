@@ -38,12 +38,11 @@ const utils_1 = __nccwpck_require__(933);
 const REQUIRED_PR_SECTIONS = ["description", "how to test it", "approach"];
 const isUI = false;
 // TODO: find a better way for those (more dynamic)
-// the character count in each section by default
 const templateDefaults = {
-    description: 0,
-    howToTest: 64,
-    screenshots: 369,
-    approach: 50,
+    description: 30,
+    howToTest: 20,
+    screenshots: 20,
+    approach: 20,
 };
 async function run() {
     try {
@@ -66,14 +65,13 @@ async function run() {
             return;
         }
         console.log("BEFORE \n", prDescription);
-        //remove comments
+        //? remove comments from PR content
         prDescription = prDescription?.replace(/<!--[\s\S]*?-->/g, "");
-        console.log("LATER \n", prDescription);
         const prDescContent = await (0, marked_1.marked)(prDescription);
-        console.log("PARSED \n", prDescContent);
+        // console.log("PARSED \n", prDescContent);
         const foundTitles = (0, utils_1.getPrTitles)(prDescContent);
-        // core.info("Found titles are: ");
-        // console.log(foundTitles);
+        core.info("Found titles are: ");
+        console.log(foundTitles);
         const hasRequriedSections = REQUIRED_PR_SECTIONS.every((title) => foundTitles.has(title));
         if (!hasRequriedSections) {
             core.setFailed("Some required Titles are missing");
@@ -87,7 +85,8 @@ async function run() {
                 section.characterCount < 30) {
                 throw new Error(`Section ${section.title} should have more than 30 characters at least`);
             }
-            if (section.characterCount < 20) {
+            if (REQUIRED_PR_SECTIONS.includes(section.title.toLocaleLowerCase()) &&
+                section.characterCount < 20) {
                 throw new Error(`Section ${section.title} should have more than 20 characters at least`);
             }
         });
