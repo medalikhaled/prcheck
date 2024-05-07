@@ -41,10 +41,17 @@ async function run() {
       core.setFailed("PR Description is empty");
       return;
     }
+
+    console.log("BEFORE \n", prDescription);
+
     //remove comments
     prDescription = prDescription?.replace(/<!--[\s\S]*?-->/g, "");
 
+    console.log("LATER \n", prDescription);
+
     const prDescContent = await marked(prDescription);
+
+    console.log("PARSED \n", prDescContent);
 
     const foundTitles = getPrTitles(prDescContent);
 
